@@ -7,6 +7,46 @@ description: Draft or revise scientific papers in Ming Du's characteristic expla
 
 Use this skill to reproduce the author's recurring reasoning and prose habits without copying source sentences. Apply it alongside the general `research-paper-writing` skill when both are available: that skill governs story, section purpose, and claim-evidence discipline; this skill governs authorial voice, progression, cadence, transitions, and wording.
 
+## Workspace Initialization
+
+When the paper workspace is empty or the user explicitly asks to initialize it, prepare the workspace and its local LaTeX compilation environment.
+
+### Research Context and Paper Syllabus
+
+Create `AGENTS.md` in the workspace root. If it already exists, add or update the relevant sections while preserving existing instructions. Include:
+
+- **Research introduction:** Describe the research to be reported and documented, including its scientific problem, objectives, and scope, using information provided by the user. Mark missing information for the user to supply rather than inventing it.
+- **Fact-checking sources:** Record paths to the source code, results, and data used to verify manuscript claims, with a short description of each source. Confirm these paths and their intended use with the user; leave unconfirmed entries explicitly pending.
+- **Paper syllabus:** Store the detailed paper outline supplied by the user. Do not author the outline on the user's behalf. Preserve any outline already provided, and leave placeholders for undecided sections.
+
+After creating `AGENTS.md`, prompt the user to fill in or continue the syllabus. Ask for more than a single-level list of Introduction, Methods, Results, and Discussion: each section should specify its planned subsections or paragraph topics, how the content should be expanded, what should be emphasized, and how the argument should flow. Explain that the user can complete the syllabus incrementally and leave undecided sections as placeholders.
+
+Use the syllabus to guide drafting. Whenever the main text changes, update the corresponding syllabus entries so they accurately reflect the text's content, emphasis, and logical order. This synchronization records manuscript changes; it does not authorize inventing plans for unfinished sections. Preserve placeholders until the user supplies their intended content.
+
+### Project Language Instructions for Codex
+
+When initializing a project in Codex, copy this skill's [language-style instruction file](assets/language-style.md) to `<project>/.codex/language-style.md`. Preserve any user customizations if that destination already exists. Add a reference to the copied file in the project's `AGENTS.md` so its language guidance applies to both manuscript prose and project conversations.
+
+Create or update `<project>/.codex/config.toml` with the following top-level setting, preserving unrelated configuration:
+
+```toml
+model_instructions_file = "language-style.md"
+```
+
+The path is relative to the `.codex/` directory containing `config.toml`. This is Codex's supported replacement for its built-in model instructions, rather than an addition to them; higher-priority runtime instructions and enforced requirements still apply. If the project already selects a custom instructions file, preserve its existing content and incorporate the language paragraph there instead of discarding it. Keep this configuration project-local; do not modify the user's global Codex configuration.
+
+Verify that the TOML parses and its configured instructions file exists and contains the language paragraph. Codex loads project configuration only for trusted projects; if trust or a configuration restriction prevents loading it, report that activation remains pending. Start a new Codex session in the project to load the configuration; do not claim that editing these files changes the current session's prompt.
+
+See the official [configuration reference](https://learn.chatgpt.com/docs/config-file/config-reference) and [project configuration guidance](https://learn.chatgpt.com/docs/config-file/config-advanced) for the setting's behavior and scope.
+
+### Local LaTeX Compilation
+
+Inspect the operating system and available TeX tools. Prefer `latexmk`; if it is missing, attempt to install it through the existing TeX distribution's package manager or an appropriate established OS package manager, respecting applicable installation permissions and provenance requirements.
+
+If installation is blocked, fall back to the lower-level tools available for that operating system and TeX distribution, such as TeX Live or MacTeX on Unix-like systems, or MiKTeX or TeX Live on Windows. Use the manuscript's required engine (`pdflatex`, `xelatex`, or `lualatex`), run BibTeX or Biber when required, and repeat the LaTeX pass as needed to resolve citations and cross-references. If no engine is available, attempt to install an appropriate TeX distribution through an official source, subject to the same permissions; if blocked, report the missing dependency and required next step.
+
+Verify the selected workflow by compiling the existing manuscript, or a minimal temporary document if no manuscript exists. Record the working build command and relevant environment details in `AGENTS.md`. Claim compilation readiness only after a successful build; otherwise record the unresolved blocker.
+
 ## Style Objective
 
 Write as an experimental computational scientist explaining a technical system to domain scientists:
@@ -218,13 +258,14 @@ Prefer exact values, ratios, error bounds, ranges, and experimental conditions. 
 
 ## Drafting Workflow
 
-1. Determine the section role and write a one-sentence message for each planned paragraph.
+1. Consult the user-provided syllabus in `AGENTS.md`, when present. Determine the section role and write a one-sentence message for each planned paragraph within that plan; ask for the user's direction before drafting sections whose contents remain undecided.
 2. Arrange messages using the relevant section recipe.
 3. Draft each paragraph with topic -> mechanism/detail -> evidence -> consequence.
 4. Add transitions only after the logical relationships are fixed.
 5. Replace vague verbs and pronouns with concrete actions and nouns.
 6. Check every comparative or evaluative claim against a figure, table, equation, citation, or stated observation.
 7. Run the style audit below.
+8. Reflect main-text changes in the corresponding syllabus entries in `AGENTS.md`, when present.
 
 When revising existing prose, preserve valid technical content and manuscript terminology. Do not rewrite a sentence merely to insert a preferred phrase.
 
