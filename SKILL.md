@@ -51,7 +51,7 @@ Create a `Makefile` in the workspace root with `all` and `clean` targets for com
 .PHONY: all clean
 
 all:
-	latexmk -pdf -interaction=nonstopmode -halt-on-error -outdir=build main.tex
+	latexmk -pdf -interaction=nonstopmode -halt-on-error -synctex=1 -outdir=build main.tex
 
 clean:
 	latexmk -C -outdir=build main.tex
