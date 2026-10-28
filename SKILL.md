@@ -45,7 +45,21 @@ Inspect the operating system and available TeX tools. Prefer `latexmk`; if it is
 
 If installation is blocked, fall back to the lower-level tools available for that operating system and TeX distribution, such as TeX Live or MacTeX on Unix-like systems, or MiKTeX or TeX Live on Windows. Use the manuscript's required engine (`pdflatex`, `xelatex`, or `lualatex`), run BibTeX or Biber when required, and repeat the LaTeX pass as needed to resolve citations and cross-references. If no engine is available, attempt to install an appropriate TeX distribution through an official source, subject to the same permissions; if blocked, report the missing dependency and required next step.
 
-Verify the selected workflow by compiling the existing manuscript, or a minimal temporary document if no manuscript exists. Record the working build command and relevant environment details in `AGENTS.md`. Claim compilation readiness only after a successful build; otherwise record the unresolved blocker.
+Create a `Makefile` in the workspace root with `all` and `clean` targets for compilation and cleanup. Preserve existing targets if a Makefile is already present. For a `main.tex` manuscript using `pdflatex`, use:
+
+```makefile
+.PHONY: all clean
+
+all:
+	latexmk -pdf -interaction=nonstopmode -halt-on-error -outdir=build main.tex
+
+clean:
+	latexmk -C -outdir=build main.tex
+```
+
+Use literal tabs to indent recipes. Adapt the main filename and engine flags to the manuscript, or use the verified fallback commands if `latexmk` is unavailable. Keep generated output in `build/`; `make clean` removes generated files, including the compiled PDF.
+
+Verify the selected workflow by compiling the existing manuscript, or a minimal temporary document if no manuscript exists. Where `make` is available, verify the Makefile's build and cleanup targets. Record the working build and cleanup commands and relevant environment details in `AGENTS.md`. Claim compilation readiness only after a successful build; otherwise record the unresolved blocker.
 
 ## Style Objective
 
