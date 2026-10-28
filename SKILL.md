@@ -61,6 +61,16 @@ Use literal tabs to indent recipes. Adapt the main filename and engine flags to 
 
 Verify the selected workflow by compiling the existing manuscript, or a minimal temporary document if no manuscript exists. Where `make` is available, verify the Makefile's build and cleanup targets. Record the working build and cleanup commands and relevant environment details in `AGENTS.md`. Claim compilation readiness only after a successful build; otherwise record the unresolved blocker.
 
+### VS Code and LaTeX Workshop
+
+During initialization, ask whether the user edits the LaTeX paper in VS Code, unless they have already specified their editor. If so, suggest installing [LaTeX Workshop](https://marketplace.visualstudio.com/items?itemName=James-Yu.LaTeX-Workshop) if it is not already installed. Inspect and update the project's `.vscode/settings.json`, creating it if needed and preserving unrelated settings, existing recipes, and JSONC comments.
+
+- Set `latex-workshop.latex.outDir` to the actual build output directory, normally `%DIR%/build` when the root TeX file and Makefile are in the workspace root. This setting must match the build command's output location.
+- Check `latex-workshop.latex.tools`, `latex-workshop.latex.recipes`, and `latex-workshop.latex.recipe.default`. When a Makefile exists, add or update a tool that runs `make all` in the Makefile's directory and select its recipe as the default. Otherwise, use the verified compilation command from the local setup. Resolve conflicting external build commands or recipe overrides so the intended command actually runs.
+- Set `latex-workshop.latex.autoBuild.run` to `"onSave"`.
+
+Validate the settings as JSONC. When VS Code is accessible, verify that saving a `.tex` file triggers the intended build and that LaTeX Workshop finds the resulting PDF and SyncTeX files. Otherwise, give the user this verification step and report editor integration as unverified. Refer to the official [compilation settings documentation](https://github.com/James-Yu/LaTeX-Workshop/wiki/Compile) when needed.
+
 ## Style Objective
 
 Write as an experimental computational scientist explaining a technical system to domain scientists:
